@@ -1,0 +1,220 @@
+<!DOCTYPE html>  <html> <head>   <title>99bottles.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               99bottles.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>99 Bottles of Beer</h2>
+
+<p>Sung by <a href="http://coffeescript.org">CoffeeScript</a></p>
+
+<p>This is an example application to show off some of the neat parts of the
+CoffeeScript language. It was intended as a submission to ther
+<a href="http://99-bottles-of-beer.net/">99 bottles of beer</a> programming language database.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h3>Capitalize a string</h3>
+
+<p>A utility method to quickly capitalize the first letter in a string.
+This is added onto the <code>String</code> object as a utility.</p>
+
+<p>The <code>::</code> operator is a CS form of the JavaScript prototype:</p>
+
+<pre><code>String.prototype.cap = function() {...}
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="nb">String</span><span class="o">::</span><span class="nv">cap = </span><span class="o">-&gt;</span>
+  <span class="nx">@charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">@slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h3>Our main namespace</h3>
+
+<p>A namespace for all our code. This allows us to export just one object instead
+of several. It also houses variables for state, defaults, and strings.</p>
+
+<h4>State machine</h4>
+
+<p>A simple variable to allow us to interactively turn off any running timed
+events.</p>
+
+<h4>Defaults</h4>
+
+<p>Provides a easy accessible spot to change configuration options.</p>
+
+<h4>Strings</h4>
+
+<p>Used to easily change the strings used in the song. Perhaps different wording
+or localizing to another language. This is a simplistic way of doing that.</p>
+
+<h4>Application Error objects</h4>
+
+<p>Easily create throw-able and query-able errors.</p>
+
+<p>Instead of making new classes for errors or just sending a simple string
+(which would make querying more difficult and would <em>not</em> DRY the code) we can
+use an object which has the name and message properties already defined.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">App =</span>
+  <span class="nv">asyncRunning: </span><span class="kc">on</span>
+  <span class="nv">defaults:</span>
+    <span class="nv">bottle_count: </span><span class="mi">99</span>
+    <span class="nv">loop_delay: </span><span class="mi">500</span>
+  <span class="nv">strings:</span>
+    <span class="nv">bottle: </span><span class="s2">&quot;bottle of beer&quot;</span>
+    <span class="nv">bottles: </span><span class="s2">&quot;bottles of beer&quot;</span>
+    <span class="nv">on_the_wall: </span><span class="s2">&quot;on the wall&quot;</span>
+    <span class="nv">take_one_down: </span><span class="s2">&quot;take one down and pass it around&quot;</span>
+    <span class="nv">buy_some_more: </span><span class="s2">&quot;go to the store and buy some more&quot;</span>
+    <span class="nv">no_more: </span><span class="s2">&quot;no more&quot;</span>
+    <span class="nv">large_loop_warn: </span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">      Calculating this many bottles in a loop can slow down your</span>
+<span class="s2">      browser or freeze it. Are you sure you wish to continue?</span>
+<span class="s2">      &quot;&quot;&quot;</span>
+  <span class="nv">errors:</span>
+    <span class="nv">BottleCountTooSmall:</span>
+      <span class="nv">name: </span><span class="s2">&quot;BottleCountError&quot;</span>
+      <span class="nv">message: </span><span class="s2">&quot;bottle count cannot be less then 1&quot;</span>
+    <span class="nv">BottleCountTooLarge:</span>
+      <span class="nv">name: </span><span class="s2">&quot;BottleCountError&quot;</span>
+      <span class="nv">message: </span><span class="s2">&quot;bottle count too large for display method&quot;</span>
+    <span class="nv">MissingArgument:</span>
+      <span class="nv">name: </span><span class="s2">&quot;ArgumentError&quot;</span>
+      <span class="nv">message: </span><span class="s2">&quot;missing argument&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Class Song</h3>
+
+<p>This is the main logic for singing a song. Because there is more then one way
+to make the looping (synchronous vs asynchronous) this class acts as an
+adapter which other <em>song methods</em> will extend to implement the <em>song</em>
+functionality.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Song</span>
+  <span class="nv">constructor: </span><span class="nf">(@initial_bottle_count = App.defaults.bottle_count) -&gt;</span>
+    <span class="k">throw</span> <span class="nx">App</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">BottleCountTooSmall</span> <span class="nx">unless</span> <span class="nx">@initial_bottle_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="vi">@bottle_count = </span><span class="nx">@initial_bottle_count</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p><code>gitDisplay()</code> will either return the save display adapter or make a
+default one the first imte this method is called.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">getDisplay: </span><span class="o">-&gt;</span>
+    <span class="nx">@display</span> <span class="o">?=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">ConsoleDisplay</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Allow us to set the display adapter programatically.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">setDisplay: </span><span class="nf">(@display) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Get and construct the string for how many bottles we have.</p>
+
+<p>It can handle arguments but we default them to what would normally be used
+to add some flexability. Using the = operator in the argument list CS
+automatically takes care of assignment for us and we don't have to type in
+any initialization at the beginning of the function.</p>
+
+<p>the variable <code>s</code> is used to prevent from having to type <code>App.strings</code> over
+and over.</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">bottles: </span><span class="nf">(count = @bottle_count, s = App.strings) -&gt;</span>
+    <span class="nv">num = </span><span class="k">if</span> <span class="nx">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">then</span> <span class="s2">&quot;#{count}&quot;</span> <span class="k">else</span> <span class="nx">s</span><span class="p">.</span><span class="nx">no_more</span>
+    <span class="k">if</span> <span class="nx">count</span> <span class="o">is</span> <span class="mi">1</span>
+      <span class="s2">&quot;#{num} #{s.bottle}&quot;</span>
+    <span class="k">else</span>
+      <span class="s2">&quot;#{num} #{s.bottles}&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">printVerse: </span><span class="nf">(s = App.strings) -&gt;</span>
+    <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">print</span> <span class="s2">&quot;#{@bottles().cap()} #{s.on_the_wall}, #{@bottles()}.&quot;</span>
+    <span class="k">if</span> <span class="nx">@bottle_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
+      <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">print</span> <span class="s2">&quot;#{s.take_one_down.cap()}, #{@bottles(@bottle_count - 1)} #{s.on_the_wall}.&quot;</span>
+    <span class="k">else</span>
+      <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">print</span> <span class="s2">&quot;#{s.buy_some_more.cap()}, #{@bottles(@initial_bottle_count)} #{s.on_the_wall}.&quot;</span>
+    <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">flush</span><span class="p">()</span>
+  <span class="nv">sing: </span><span class="o">-&gt;</span>
+    <span class="k">throw</span> <span class="nx">App</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">BottleCountTooLarge</span> <span class="k">if</span> <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">isBottleCountUnsafe</span><span class="p">(</span><span class="nx">@bottle_count</span><span class="p">)</span>
+    <span class="nx">@getDisplay</span><span class="p">().</span><span class="nx">clear</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">SyncSong</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Song</span>
+  <span class="nv">constructor: </span><span class="nf">(bottles) -&gt;</span>
+    <span class="k">if</span> <span class="nx">bottles</span> <span class="o">&gt;=</span> <span class="mi">1200</span>
+      <span class="k">throw</span> <span class="nx">App</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">BottleCountTooLarge</span> <span class="nx">unless</span> <span class="nx">confirm</span> <span class="nx">App</span><span class="p">.</span><span class="nx">strings</span><span class="p">.</span><span class="nx">large_loop_warn</span>
+    <span class="k">super</span> <span class="nx">bottles</span>
+  <span class="nv">sing: </span><span class="o">-&gt;</span>
+    <span class="k">super</span>
+    <span class="k">while</span> <span class="nx">@bottle_count</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+      <span class="nx">@printVerse</span><span class="p">()</span>
+      <span class="nx">@bottle_count</span><span class="o">--</span>
+    <span class="k">return</span>
+
+
+<span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">AsyncSong</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">Song</span>
+  <span class="nv">constructor: </span><span class="nf">(bottles, @callback) -&gt;</span>
+    <span class="k">super</span> <span class="nx">bottles</span>
+    <span class="nv">App.asyncRunning = </span><span class="kc">on</span>
+  <span class="nv">sing: </span><span class="o">-&gt;</span>
+    <span class="k">super</span>
+    <span class="nx">@singVerse</span><span class="p">()</span>
+  <span class="nv">singVerse: </span><span class="o">=&gt;</span>
+    <span class="k">if</span> <span class="nx">App</span><span class="p">.</span><span class="nx">asyncRunning</span> <span class="o">and</span> <span class="nx">@bottle_count</span> <span class="o">&gt;=</span> <span class="mi">0</span> 
+      <span class="nx">@printVerse</span><span class="p">()</span>
+      <span class="nx">@bottle_count</span><span class="o">--</span>
+      <span class="nx">setTimeout</span> <span class="nx">@singVerse</span><span class="p">,</span> <span class="nx">App</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">loop_delay</span>
+    <span class="k">else</span>
+      <span class="nx">@callback</span><span class="o">?</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">Display</span> <span class="nx">Adapters</span>
+<span class="nx">Used</span> <span class="nx">to</span> <span class="nx">display</span> <span class="nx">the</span> <span class="nx">results</span><span class="p">.</span> <span class="nx">Uses</span> <span class="nx">an</span> <span class="nx">adapter</span> <span class="nx">model</span> <span class="nx">to</span> <span class="nx">allow</span> <span class="nx">multiple</span> <span class="nx">ways</span> <span class="nx">to</span> <span class="nx">display</span> <span class="nx">the</span> <span class="nx">output</span><span class="p">.</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span>
+  <span class="nv">constructor: </span><span class="o">-&gt;</span>
+    <span class="nx">@resetLines</span><span class="p">()</span>
+  <span class="nv">isBottleCountUnsafe: </span><span class="nf">(bottle_count) -&gt;</span> <span class="kc">no</span>
+  <span class="nv">clear: </span><span class="o">-&gt;</span>
+    <span class="nx">@resetLines</span><span class="p">()</span>
+  <span class="nv">print: </span><span class="nf">(text) -&gt;</span>
+    <span class="nx">@lines</span><span class="p">.</span><span class="nx">push</span> <span class="nx">text</span>
+  <span class="nv">flush: </span><span class="o">-&gt;</span>
+  <span class="nv">resetLines: </span><span class="o">-&gt;</span>
+    <span class="vi">@lines = </span><span class="p">[]</span>
+  <span class="vi">@getAdapter: </span><span class="nf">(display_id, selector) -&gt;</span>
+    <span class="k">switch</span> <span class="nx">display_id</span>
+      <span class="k">when</span> <span class="s2">&quot;jq&quot;</span> <span class="k">then</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">JqDisplay</span><span class="p">(</span><span class="nx">selector</span><span class="p">)</span>
+      <span class="k">when</span> <span class="s2">&quot;alert&quot;</span> <span class="k">then</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">AlertDisplay</span>
+      <span class="k">when</span> <span class="s2">&quot;dom&quot;</span> <span class="k">then</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DomDisplay</span><span class="p">(</span><span class="nx">selector</span><span class="p">)</span>
+      <span class="k">else</span> <span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">ConsoleDisplay</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">jQuery</span> <span class="nx">diaply</span> <span class="nx">adapter</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">do</span> <span class="nf">($ = jQuery) -&gt;</span>
+  <span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">JqDisplay</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span>
+    <span class="nv">constructor: </span><span class="nf">(@selector) -&gt;</span>
+      <span class="k">throw</span> <span class="nx">App</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">MissingArgument</span> <span class="nx">unless</span> <span class="nx">@selector</span><span class="o">?</span>
+      <span class="k">super</span>
+      <span class="vi">@el = </span><span class="nx">$</span><span class="p">(</span><span class="nx">@selector</span><span class="p">)</span>
+    <span class="nv">clear: </span><span class="o">-&gt;</span>
+      <span class="k">super</span>
+      <span class="nx">@el</span><span class="p">.</span><span class="nx">empty</span><span class="p">()</span>
+    <span class="nv">flush: </span><span class="o">-&gt;</span>
+      <span class="nv">html = </span><span class="s2">&quot;&lt;p&gt;&quot;</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;#{line}&lt;br /&gt;&quot;</span> <span class="k">for</span> <span class="nx">line</span> <span class="k">in</span> <span class="nx">@lines</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/p&gt;&quot;</span>
+      <span class="nx">@el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">html</span>
+      <span class="nx">@resetLines</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">Console</span> <span class="nx">Display</span> <span class="nx">Adapter</span> <span class="p">(</span><span class="nx">default</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">ConsoleDisplay</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span>
+  <span class="nv">print: </span><span class="nf">(text) -&gt;</span>
+    <span class="nx">console</span><span class="o">?</span><span class="p">.</span><span class="nx">log</span> <span class="nx">text</span>
+  <span class="nv">flush: </span><span class="o">-&gt;</span>
+    <span class="nx">console</span><span class="o">?</span><span class="p">.</span><span class="nx">log</span> <span class="s2">&quot;-----&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">Non</span><span class="o">-</span><span class="nx">jQuery</span> <span class="nx">dom</span> <span class="nx">display</span> <span class="nx">adapter</span>
+<span class="nx">Used</span> <span class="nx">to</span> <span class="nx">show</span> <span class="nx">how</span> <span class="nx">to</span> <span class="nx">manipulate</span> <span class="nx">the</span> <span class="nx">dom</span> <span class="k">for</span> <span class="k">when</span> <span class="nx">jQuery</span> <span class="o">is</span> <span class="o">not</span> <span class="nx">used</span><span class="p">.</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DomDisplay</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span>
+  <span class="nv">constructor: </span><span class="nf">(@selector) -&gt;</span>
+    <span class="k">throw</span> <span class="nx">App</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">MissingArgument</span> <span class="nx">unless</span> <span class="nx">@selector</span><span class="o">?</span>
+    <span class="k">super</span>
+    <span class="vi">@el = </span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="nx">@selector</span><span class="p">)</span>
+  <span class="nv">clear: </span><span class="o">-&gt;</span>
+    <span class="k">super</span>
+    <span class="vi">@el.innerHTML = </span><span class="s2">&quot;&quot;</span>
+  <span class="nv">flush: </span><span class="o">-&gt;</span>
+    <span class="nv">html = </span><span class="s2">&quot;&quot;</span>
+    <span class="nx">html</span> <span class="o">+=</span> <span class="s2">&quot;#{line} &lt;br /&gt;&quot;</span> <span class="k">for</span> <span class="nx">line</span> <span class="k">in</span> <span class="nx">@lines</span>
+    <span class="nv">p = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s2">&quot;p&quot;</span>
+    <span class="nv">p.innerHTML = </span><span class="nx">html</span>
+    <span class="nx">@el</span><span class="p">.</span><span class="nx">appendChild</span> <span class="nx">p</span>
+    <span class="nx">@resetLines</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">Alert</span> <span class="nx">display</span> <span class="nx">adapter</span></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">App</span><span class="p">.</span><span class="nx">AlertDisplay</span> <span class="k">extends</span> <span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span>
+  <span class="nv">isBottleCountUnsafe: </span><span class="nf">(bottle_count) -&gt;</span> <span class="p">(</span><span class="nx">bottle_count</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span>
+  <span class="nv">flush: </span><span class="o">-&gt;</span>
+    <span class="nv">text = </span><span class="s2">&quot;&quot;</span>
+    <span class="nx">text</span> <span class="o">+=</span> <span class="s2">&quot;#{line}\n&quot;</span> <span class="k">for</span> <span class="nx">line</span> <span class="k">in</span> <span class="nx">@lines</span>
+    <span class="nx">@resetLines</span><span class="p">()</span>
+    <span class="nx">alert</span> <span class="nx">text</span>
+
+
+<span class="nb">window</span><span class="p">.</span><span class="nv">App = </span><span class="nx">App</span></pre></div>             </td>           </tr>                               <tr id="section-19">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-19">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">Program</span> <span class="nx">main</span> <span class="nx">runner</span> <span class="p">(</span><span class="nx">jQuery</span> <span class="nb">document</span> <span class="nx">ready</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-20">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-20">&#182;</a>               </div>               <h1>#</h1>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">App.enableControls = </span><span class="o">-&gt;</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">removeAttr</span> <span class="s2">&quot;disabled&quot;</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#asyncControls button&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s2">&quot;disabled&quot;</span><span class="p">,</span> <span class="kc">true</span>
+<span class="nv">App.disableControls = </span><span class="o">-&gt;</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s2">&quot;disabled&quot;</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#asyncControls button&quot;</span><span class="p">).</span><span class="nx">removeAttr</span> <span class="s2">&quot;disabled&quot;</span>
+<span class="nv">App.run = </span><span class="nf">(e) -&gt;</span>
+  <span class="nv">d = </span><span class="nx">$</span><span class="p">(</span><span class="err">@</span><span class="p">).</span><span class="nx">data</span> <span class="s2">&quot;display&quot;</span>
+  <span class="nv">adapter = </span><span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span><span class="p">.</span><span class="nx">getAdapter</span> <span class="nx">d</span><span class="p">,</span> <span class="s2">&quot;#output&quot;</span>
+  <span class="nv">bottles = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#bottleCount&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">())</span>
+
+  <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;input[name=async]:checked&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">is</span> <span class="s2">&quot;yes&quot;</span>
+    <span class="nx">App</span><span class="p">.</span><span class="nx">disableControls</span><span class="p">()</span>
+    <span class="nv">mySong = </span><span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">AsyncSong</span> <span class="nx">bottles</span><span class="p">,</span> <span class="nx">App</span><span class="p">.</span><span class="nx">enableControls</span>
+  <span class="k">else</span>
+    <span class="nv">mySong = </span><span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">SyncSong</span> <span class="nx">bottles</span>
+  
+  <span class="nx">mySong</span><span class="p">.</span><span class="nx">setDisplay</span><span class="p">(</span><span class="nx">adapter</span><span class="p">)</span>
+  
+  <span class="k">try</span>
+    <span class="nx">mySong</span><span class="p">.</span><span class="nx">sing</span><span class="p">()</span>
+  <span class="k">catch</span> <span class="nx">e</span>
+    <span class="k">if</span> <span class="nx">e</span><span class="p">.</span><span class="nx">name</span> <span class="o">is</span> <span class="s2">&quot;BottleCountError&quot;</span>
+      <span class="nx">adapter</span><span class="p">.</span><span class="nx">print</span> <span class="s2">&quot;#{e.message.cap()}.&quot;</span>
+      <span class="nx">adapter</span><span class="p">.</span><span class="nx">flush</span><span class="p">()</span>
+    <span class="k">else</span> <span class="k">throw</span> <span class="nx">e</span>
+
+<span class="nx">$</span> <span class="o">-&gt;</span>
+  <span class="nx">App</span><span class="p">.</span><span class="nx">enableControls</span><span class="p">()</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">click</span> <span class="nx">App</span><span class="p">.</span><span class="nx">run</span>
+  <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#stopAsyncBtn&quot;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
+    <span class="nv">App.asyncRunning = </span><span class="kc">off</span>
+    <span class="nx">App</span><span class="p">.</span><span class="nx">enableControls</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

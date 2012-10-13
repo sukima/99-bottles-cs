@@ -1,12 +1,21 @@
 # 99 Bottles of Beer
 # ------------------
-# Sung by [CoffeeScript](http://coffeescript.org)
+# Sung by [CoffeeScript](http://coffeescript.org)  
+# Writen by [Devin Weaver](http://tritarget.org)
 #
 # This is an example application to show off some of the neat parts of the
-# CoffeeScript language. It was intended as a submission to ther
+# CoffeeScript language. It was intended as a submission to their
 # [99 bottles of beer][] programming language database.
 #
+# This file is the basic file you would use to run in your own webpage. The
+# supporting files such as the original [source][], [demo][] or to run the
+# [unit tests][] You can visit the project [homepage][]
+#
 # [99 bottles of beer]: http://99-bottles-of-beer.net/
+# [source]: http://github.com/sukima/99-bottles-cs/
+# [demo]: http://sukima.github.com/99-bottles-cs/
+# [unit tests]: http://sukima.github.com/99-bottles-cs/
+# [homepage]: http://sukima.github.com/99-bottles-cs/
 
 
 # ### Capitalize a string
@@ -35,6 +44,9 @@ String::cap = ->
 # #### Strings
 # Used to easily change the strings used in the song. Perhaps different wording
 # or localizing to another language. This is a simplistic way of doing that.
+#
+# This also shows the use of CS
+# [heredoc](http://rosettacode.org/wiki/Here_document#CoffeeScript).
 #
 # #### Application Error objects
 # Easily create throw-able and query-able errors.
@@ -81,17 +93,17 @@ class App.Song
     @bottle_count = @initial_bottle_count
 
   # `gitDisplay()` will either return the save display adapter or make a
-  # default one the first imte this method is called.
+  # default one the first time this method is called.
   getDisplay: ->
     @display ?= new App.ConsoleDisplay
 
-  # Allow us to set the display adapter programatically.
+  # Allow us to set the display adapter pragmatically.
   setDisplay: (@display) ->
 
   # Get and construct the string for how many bottles we have.
   #
   # It can handle arguments but we default them to what would normally be used
-  # to add some flexability. Using the = operator in the argument list CS
+  # to add some flexibility. Using the = operator in the argument list CS
   # automatically takes care of assignment for us and we don't have to type in
   # any initialization at the beginning of the function.
   #
@@ -104,7 +116,8 @@ class App.Song
     else
       "#{num} #{s.bottles}"
 
-  # 
+  # Construct a full verse taking into account how many bottles are left. Then
+  # use the assigned display adapter to output the new verse.
   printVerse: (s = App.strings) ->
     @getDisplay().print "#{@bottles().cap()} #{s.on_the_wall}, #{@bottles()}."
     if @bottle_count > 0
@@ -112,11 +125,22 @@ class App.Song
     else
       @getDisplay().print "#{s.buy_some_more.cap()}, #{@bottles(@initial_bottle_count)} #{s.on_the_wall}."
     @getDisplay().flush()
+
+  # This is the main method for the singing loop. Because we wanted to offer
+  # examples of different loop methods we will inherit from the Song class and
+  # override the sing method.
+  #
+  # Some display adapters will really borg the browser if they are to display
+  # 100 verses (like the default 99 bottles song goes) Most notably the display
+  # method which uses alert boxes would end up displaying 100 pop ups. So we add
+  # a check to prevent using a display adapter like that. 
   sing: ->
     throw App.errors.BottleCountTooLarge if @getDisplay().isBottleCountUnsafe(@bottle_count)
     @getDisplay().clear()
 
 
+# ### Synchronized Song
+# 
 class App.SyncSong extends App.Song
   constructor: (bottles) ->
     if bottles >= 1200
@@ -138,7 +162,7 @@ class App.AsyncSong extends App.Song
     super
     @singVerse()
   singVerse: =>
-    if App.asyncRunning and @bottle_count >= 0 
+    if App.asyncRunning and @bottle_count >= 0
       @printVerse()
       @bottle_count--
       setTimeout @singVerse, App.defaults.loop_delay

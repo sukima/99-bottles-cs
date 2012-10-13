@@ -1,5 +1,5 @@
 node_modules/
-docs/
 src/*.js
+public/docs/
 public/application.js
 public/application.css

@@ -20,7 +20,6 @@ task 'watch', 'Watch src/ for changes', ->
     print data.toString()
 
 task 'server', 'Spawn a server at http://0.0.0.0:9294/', ->
-  invoke 'docs'
   coffee = spawn 'hem', ['server']
   coffee.stderr.on 'data', (data) ->
     process.stderr.write data.toString()

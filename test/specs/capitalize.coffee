@@ -1,7 +1,7 @@
 require = window.require
 
 describe "String::cap()", ->
-  require("99bottles")
+  App = require("99bottles")
 
   it 'capitalizes the first character', ->
     expect( "this is a test".cap() ).toBe "This is a test"

@@ -2,5 +2,5 @@
   "public": "./public",
   "paths": ["./src"],
   "dependencies": [],
-  "libs": []
+  "libs": ["lib/jquery.min.js"]
 }

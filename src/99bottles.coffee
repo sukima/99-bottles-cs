@@ -257,9 +257,6 @@ class App.AlertDisplay extends App.DisplayAdapter
     alert text
 
 
-window.App = App
-
-
 # ## Program main runner
 # (jQuery document ready)
 App.enableControls = ->
@@ -295,3 +292,7 @@ $ ->
   $("#stopAsyncBtn").click ->
     App.asyncRunning = off
     App.enableControls()
+
+
+window.App = App
+module?.exports = App

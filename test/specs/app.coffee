@@ -1,6 +1,7 @@
 require = window.require
 
 describe "App", ->
-  App = require("App")
+  require("99bottles")
+  App = window.App
 
   it 'can noop', ->

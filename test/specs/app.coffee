@@ -1,7 +1,9 @@
 require = window.require
 
 describe "App", ->
-  require("99bottles")
-  App = window.App
+  App = require("99bottles")
 
-  it 'can noop', ->
+  it 'defines asyncRunning', -> expect( App.asyncRunning ).toBeDefined()
+  it 'defines defaults', -> expect( App.defaults ).toBeDefined()
+  it 'defines strings', -> expect( App.strings ).toBeDefined()
+  it 'defines errors', -> expect( App.errors ).toBeDefined()

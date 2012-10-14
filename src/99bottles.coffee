@@ -269,9 +269,9 @@ App.disableControls = ->
   $("#runControls button").attr "disabled", true
   $("#asyncControls button").removeAttr "disabled"
 App.run = (e) ->
-  d = $(@).data "display"
-  adapter = App.DisplayAdapter.getAdapter d, "#output"
-  bottles = parseInt($("#bottleCount").val())
+  display_type = $(this).data "display"
+  adapter = App.DisplayAdapter.getAdapter display_type, "#output"
+  bottles = parseInt $("#bottleCount").val()
 
   if $("input[name=async]:checked").val() is "yes"
     App.disableControls()

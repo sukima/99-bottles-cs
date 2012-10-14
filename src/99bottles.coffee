@@ -130,30 +130,40 @@ class App.Song
   # examples of different loop methods we will inherit from the Song class and
   # override the sing method.
   #
-  # Some display adapters will really borg the browser if they are to display
+  # Some display adapters will really bork the browser if they are to display
   # 100 verses (like the default 99 bottles song goes) Most notably the display
   # method which uses alert boxes would end up displaying 100 pop ups. So we add
-  # a check to prevent using a display adapter like that. 
+  # a check to prevent executing with that many bottles.
   sing: ->
     throw App.errors.BottleCountTooLarge if @getDisplay().isBottleCountUnsafe(@bottle_count)
     @getDisplay().clear()
 
 
 # ### Synchronized Song
-# 
+# This version of the loop is *synchronous* meaning it will block the
+# environment until the loop finishes.
+#
+# Becouse of this blocking if our loop is too long it can freeze the browser.
+# The contructor will ask the user if they are sure they want to continue if the
+# requested number of verses reach 1200 bottles.
 class App.SyncSong extends App.Song
   constructor: (bottles) ->
     if bottles >= 1200
       throw App.errors.BottleCountTooLarge unless confirm App.strings.large_loop_warn
     super bottles
+  # We overide the sing method to run our loop. Calling super allows us to use
+  # the safty checks from the parrent Song object above.
   sing: ->
     super
-    while @bottle_count >= 0
-      @printVerse()
-      @bottle_count--
+    # The for loop is a good example of how simple CS can be.
+    @printVerse() for i in [@bottle_count..0]
+    # The use of return at the end stops CS from creating a results array like
+    # it usually does with the for loop. It's done purly so the JavaScript
+    # created is slightly more efficient since we will not use the results.
     return
 
 
+# ### Asynchronous Song
 class App.AsyncSong extends App.Song
   constructor: (bottles, @callback) ->
     super bottles
@@ -170,10 +180,9 @@ class App.AsyncSong extends App.Song
       @callback?()
 
 
-###
-Display Adapters
-Used to display the results. Uses an adapter model to allow multiple ways to display the output.
-###
+# ##Display Adapters
+# Used to display the results. Uses an adapter model to allow multiple ways to
+# display the output.
 class App.DisplayAdapter
   constructor: ->
     @resetLines()
@@ -193,9 +202,7 @@ class App.DisplayAdapter
       else new App.ConsoleDisplay
 
 
-###
-jQuery diaply adapter
-###
+# ### jQuery diaply adapter
 do ($ = jQuery) ->
   class App.JqDisplay extends App.DisplayAdapter
     constructor: (@selector) ->
@@ -213,9 +220,7 @@ do ($ = jQuery) ->
       @resetLines()
 
 
-###
-Console Display Adapter (default)
-###
+# ### Console Display Adapter (default)
 class App.ConsoleDisplay extends App.DisplayAdapter
   print: (text) ->
     console?.log text
@@ -223,10 +228,8 @@ class App.ConsoleDisplay extends App.DisplayAdapter
     console?.log "-----"
 
 
-###
-Non-jQuery dom display adapter
-Used to show how to manipulate the dom for when jQuery is not used.
-###
+# ### Non-jQuery dom display adapter
+# Used to show how to manipulate the dom for when jQuery is not used.
 class App.DomDisplay extends App.DisplayAdapter
   constructor: (@selector) ->
     throw App.errors.MissingArgument unless @selector?
@@ -244,9 +247,7 @@ class App.DomDisplay extends App.DisplayAdapter
     @resetLines()
 
 
-###
-Alert display adapter
-###
+# ### Alert display adapter
 class App.AlertDisplay extends App.DisplayAdapter
   isBottleCountUnsafe: (bottle_count) -> (bottle_count > 5)
   flush: ->
@@ -259,9 +260,8 @@ class App.AlertDisplay extends App.DisplayAdapter
 window.App = App
 
 
-###
-Program main runner (jQuery document ready)
-###
+# ## Program main runner
+# (jQuery document ready)
 App.enableControls = ->
   $("#runControls button").removeAttr "disabled"
   $("#asyncControls button").attr "disabled", true

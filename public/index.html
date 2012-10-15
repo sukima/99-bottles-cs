@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>99 Bottle on the Wall with CoffeeScript</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="text/javascript" src="/application.js"></script>
+  </head>
+  <body>
+    <h1>99 Bottles of Beer</h1>
+    <p class="subtitle">Sung by <a href="http://coffeescript.org" target="_blank">CoffeeScript</a><br />
+    Writen by <a href="http://tritarget.org">Devin Weaver</a></p>
+    <div id="controls">
+      <fieldset>
+        <label for="bottleCount">Bottle count:</label>
+        <input id="bottleCount" type="number" value="99" />
+        <label for="async">Execution method:</label>
+        <input type="radio" name="async" value="yes" checked="checked">Asyncronous</input>
+        <input type="radio" name="async" value="no">Syncronized</input>
+      </fieldset>
+      <fieldset id="runControls">
+        <button data-display="console" id="runConsoleBtn">Run in console</button>
+        <button data-display="jq" id="runJqueryBtn">Run using jQuery</button>
+        <button data-display="dom" id="runDomBtn">Run using native DOM manipulation</button>
+        <button data-display="alert" id="runAlertBtn">Run using alert boxes (max 5)</button>
+      </fieldset>
+      <fieldset id="asyncControls">
+        <button id="stopAsyncBtn">Stop Asyncronous Execution</button>
+      </fieldset>
+    </div>
+    <div id="output">
+      <p>Press one of the run buttons to make the program sing.</p>
+    </div>
+  </body>
+</html>

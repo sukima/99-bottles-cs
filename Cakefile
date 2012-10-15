@@ -37,6 +37,6 @@ task 'docs', 'Build the documentation with docco', ->
     print data.toString()
 
 task 'clean', 'Clean up all generatd files', ->
-  fs.rmdir 'public/docs'
+  fs.rmdir 'public/docs' # fails on non-empty
   fs.unlink 'public/application.js'
   fs.unlink 'public/application.css'

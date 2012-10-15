@@ -14,11 +14,13 @@ describe 'AsyncSong', ->
   describe 'sing', ->
 
     beforeEach ->
+      @display = jasmine.createSpyObj 'TestDisplay', ['clear','print','flush','isBottleCountUnsafe']
       jasmine.Clock.useMock()
       @callback = jasmine.createSpy('callback')
 
     it 'should stop when App.asyncRunning is off', ->
       song = new AsyncSong(10, @callback)
+      song.setDisplay @display
       spyOn(song, 'singVerse').andCallThrough()
       song.sing()
       expect( song.singVerse ).toHaveBeenCalled()
@@ -32,6 +34,7 @@ describe 'AsyncSong', ->
 
     it 'should call the callback when finished', ->
       song = new AsyncSong(1, @callback)
+      song.setDisplay @display
       spyOn(song, 'singVerse').andCallThrough()
       song.sing()
       expect( song.singVerse ).toHaveBeenCalled()

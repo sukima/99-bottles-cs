@@ -54,32 +54,32 @@ String::cap = ->
 # Instead of making new classes for errors or just sending a simple string
 # (which would make querying more difficult and would _not_ DRY the code) we can
 # use an object which has the name and message properties already defined.
-App =
-  asyncRunning: on
-  defaults:
-    bottle_count: 99
-    loop_delay: 500
-  strings:
-    bottle: "bottle of beer"
-    bottles: "bottles of beer"
-    on_the_wall: "on the wall"
-    take_one_down: "take one down and pass it around"
-    buy_some_more: "go to the store and buy some more"
-    no_more: "no more"
-    large_loop_warn: """
-      Calculating this many bottles in a loop can slow down your
-      browser or freeze it. Are you sure you wish to continue?
-      """
-  errors:
-    BottleCountTooSmall:
-      name: "BottleCountError"
-      message: "bottle count cannot be less then 1"
-    BottleCountTooLarge:
-      name: "BottleCountError"
-      message: "bottle count too large for display method"
-    MissingArgument:
-      name: "ArgumentError"
-      message: "missing argument"
+App = {} unless App?
+App.asyncRunning = on
+App.defaults =
+  bottle_count: 99
+  loop_delay: 500
+App.strings =
+  bottle: "bottle of beer"
+  bottles: "bottles of beer"
+  on_the_wall: "on the wall"
+  take_one_down: "take one down and pass it around"
+  buy_some_more: "go to the store and buy some more"
+  no_more: "no more"
+  large_loop_warn: """
+    Calculating this many bottles in a loop can slow down your
+    browser or freeze it. Are you sure you wish to continue?
+    """
+App.errors =
+  BottleCountTooSmall:
+    name: "BottleCountError"
+    message: "bottle count cannot be less then 1"
+  BottleCountTooLarge:
+    name: "BottleCountError"
+    message: "bottle count too large for display method"
+  MissingArgument:
+    name: "ArgumentError"
+    message: "missing argument"
 
 
 # ### Class Song
@@ -255,43 +255,6 @@ class App.AlertDisplay extends App.DisplayAdapter
     text += "#{line}\n" for line in @lines
     @resetLines()
     alert text
-
-
-# ## Program main runner
-# (jQuery document ready)
-App.enableControls = ->
-  $("#runControls button").removeAttr "disabled"
-  $("#asyncControls button").attr "disabled", true
-App.disableControls = ->
-  $("#runControls button").attr "disabled", true
-  $("#asyncControls button").removeAttr "disabled"
-App.run = (e) ->
-  display_type = $(this).data "display"
-  adapter = App.DisplayAdapter.getAdapter display_type, "#output"
-  bottles = parseInt $("#bottleCount").val()
-
-  if $("input[name=async]:checked").val() is "yes"
-    App.disableControls()
-    mySong = new App.AsyncSong bottles, App.enableControls
-  else
-    mySong = new App.SyncSong bottles
-  
-  mySong.setDisplay(adapter)
-  
-  try
-    mySong.sing()
-  catch e
-    if e.name is "BottleCountError"
-      adapter.print "#{e.message.cap()}."
-      adapter.flush()
-    else throw e
-
-$ ->
-  App.enableControls()
-  $("#runControls button").click App.run
-  $("#stopAsyncBtn").click ->
-    App.asyncRunning = off
-    App.enableControls()
 
 
 window.App = App

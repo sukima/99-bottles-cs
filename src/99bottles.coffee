@@ -16,6 +16,31 @@
 # [demo]: http://sukima.github.com/99-bottles-cs/
 # [unit tests]: http://sukima.github.com/99-bottles-cs/
 # [homepage]: http://sukima.github.com/99-bottles-cs/
+#
+# ### How it works
+# Depending on your environment and prefered execution method you instantiate a
+# new Song and a new DisplayAdapter. Then you run the `sing()` method of the
+# Song.
+# 
+# Depending on how you wish to display the output pick a DisplayAdapter. This
+# file currently supports the following Display Adapters:
+#
+# * `ConsoleDisplay` - Will print the verses to the JavaScript console (default)
+# * `AlertDisplay` - Will pop-up an alert for each verse
+# * `DomDisplay` - Will manipulate a div to print out the song into it's contents
+# * `JqDisplay` - Uses jQuery to do the same thing as the DomDisplay
+#
+# The two choices for execution method are:
+#
+# * `SyncSong` - Uses a for loop to iterate over the verses in the song (blocking)
+# * `AsyncSong` - Uses setTimeout to iterate over the song (non-blocking)
+#
+# #### Example
+#
+#     display = new ConsoleDisplay()
+#     song = new SyncSong(99)
+#     song.setDisplay display
+#     song.sing()
 
 
 # ### Capitalize a string
@@ -33,32 +58,25 @@ String::cap = ->
 # ### Our main namespace
 # A namespace for all our code. This allows us to export just one object instead
 # of several. It also houses variables for state, defaults, and strings.
-#
+App = {} unless App?
+
 # #### State machine
 # A simple variable to allow us to interactively turn off any running timed
 # events.
-#
+App.asyncRunning = on
+
 # #### Defaults
 # Provides a easy accessible spot to change configuration options.
-#
+App.defaults =
+  bottle_count: 99
+  loop_delay: 500
+
 # #### Strings
 # Used to easily change the strings used in the song. Perhaps different wording
 # or localizing to another language. This is a simplistic way of doing that.
 #
 # This also shows the use of CS
 # [heredoc](http://rosettacode.org/wiki/Here_document#CoffeeScript).
-#
-# #### Application Error objects
-# Easily create throw-able and query-able errors.
-#
-# Instead of making new classes for errors or just sending a simple string
-# (which would make querying more difficult and would _not_ DRY the code) we can
-# use an object which has the name and message properties already defined.
-App = {} unless App?
-App.asyncRunning = on
-App.defaults =
-  bottle_count: 99
-  loop_delay: 500
 App.strings =
   bottle: "bottle of beer"
   bottles: "bottles of beer"
@@ -70,6 +88,13 @@ App.strings =
     Calculating this many bottles in a loop can slow down your
     browser or freeze it. Are you sure you wish to continue?
     """
+
+# #### Application Error objects
+# Easily create throw-able and query-able errors.
+#
+# Instead of making new classes for errors or just sending a simple string
+# (which would make querying more difficult and would _not_ DRY the code) we can
+# use an object which has the name and message properties already defined.
 App.errors =
   BottleCountTooSmall:
     name: "BottleCountError"

@@ -44,12 +44,12 @@ describe 'DisplayAdapter', ->
       expect( d?.val ).toEqual "ALERT"
 
     it 'should return a new DomDisplay with tag "dom"', ->
-      d = DisplayAdapter.getAdapter('dom')
+      d = DisplayAdapter.getAdapter('dom', '#selector')
       expect( App.DomDisplay ).toHaveBeenCalled()
       expect( d?.val ).toEqual "DOM"
 
     it 'should return a new JqDisplay with tag "jq"', ->
-      d = DisplayAdapter.getAdapter('jq')
+      d = DisplayAdapter.getAdapter('jq', '#selector')
       expect( App.JqDisplay ).toHaveBeenCalled()
       expect( d?.val ).toEqual "JQUERY"
 

@@ -2,6 +2,9 @@
 {spawn} = require 'child_process'
 fs = require 'fs'
 
+unless fs.existsSync "./node_modules/"
+  throw "Missing node_modules. Have you run 'npm install .' yet?"
+
 task 'build', 'Build public/ from src/', ->
   invoke 'docs'
   coffee = spawn 'hem', ['build']

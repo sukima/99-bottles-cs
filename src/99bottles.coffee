@@ -58,53 +58,56 @@ String::cap = ->
 # ### Our main namespace
 # A namespace for all our code. This allows us to export just one object instead
 # of several. It also houses variables for state, defaults, and strings.
-App = {} unless App?
-
+#
 # #### State machine
 # A simple variable to allow us to interactively turn off any running timed
 # events.
-App.asyncRunning = on
-
+#
 # #### Defaults
 # Provides a easy accessible spot to change configuration options.
-App.defaults =
-  bottle_count: 99
-  loop_delay: 500
-
+#
 # #### Strings
 # Used to easily change the strings used in the song. Perhaps different wording
 # or localizing to another language. This is a simplistic way of doing that.
 #
 # This also shows the use of CS
 # [heredoc](http://rosettacode.org/wiki/Here_document#CoffeeScript).
-App.strings =
-  bottle: "bottle of beer"
-  bottles: "bottles of beer"
-  on_the_wall: "on the wall"
-  take_one_down: "take one down and pass it around"
-  buy_some_more: "go to the store and buy some more"
-  no_more: "no more"
-  large_loop_warn: """
-    Calculating this many bottles in a loop can slow down your
-    browser or freeze it. Are you sure you wish to continue?
-    """
-
+#
 # #### Application Error objects
 # Easily create throw-able and query-able errors.
 #
 # Instead of making new classes for errors or just sending a simple string
 # (which would make querying more difficult and would _not_ DRY the code) we can
 # use an object which has the name and message properties already defined.
-App.errors =
-  BottleCountTooSmall:
-    name: "BottleCountError"
-    message: "bottle count cannot be less then 1"
-  BottleCountTooLarge:
-    name: "BottleCountError"
-    message: "bottle count too large for display method"
-  MissingArgument:
-    name: "ArgumentError"
-    message: "missing argument"
+App =
+  asyncRunning: on
+  defaults:
+    bottle_count: 99
+    loop_delay: 500
+  strings:
+    bottle: "bottle of beer"
+    bottles: "bottles of beer"
+    on_the_wall: "on the wall"
+    take_one_down: "take one down and pass it around"
+    buy_some_more: "go to the store and buy some more"
+    no_more: "no more"
+    large_loop_warn: """
+      Calculating this many bottles in a loop can slow down your
+      browser or freeze it. Are you sure you wish to continue?
+      """
+  errors:
+    BottleCountTooSmall:
+      name: "BottleCountError"
+      message: "bottle count cannot be less then 1"
+    BottleCountTooLarge:
+      name: "BottleCountError"
+      message: "bottle count too large for display method"
+    MissingArgument:
+      name: "ArgumentError"
+      message: "missing argument"
+    MissingLibrary:
+      name: "MissingLibrary"
+      message: "missing jQuery library"
 
 
 # ### Class Song
@@ -170,7 +173,7 @@ class App.Song
 #
 # Becouse of this blocking if our loop is too long it can freeze the browser.
 # The contructor will ask the user if they are sure they want to continue if the
-# requested number of verses reach 1200 bottles.
+# requested number of verses reach 1200 bottles. (limit choosen at a whim)
 class App.SyncSong extends App.Song
   constructor: (bottles) ->
     if bottles >= 1200
@@ -189,13 +192,30 @@ class App.SyncSong extends App.Song
 
 
 # ### Asynchronous Song
+# This execution method uses JavaScript's `setTimeout` function to return the
+# thread control back to the browser intermitently. This form of non-blocking
+# allows the user to feel like he/she still can intereact with the web page even
+# though there is work being done in the background. Granted the work is
+# blocking as it executes but because we only calculate on interval of the loop
+# at a time in between the steps the browser lets the user interact. This form
+# of asynconous code isn't trully threaded but will provide enough that it seems
+# threaded. It also has the added advantage of allowing the verses to be printed
+# out in a more delay manor as if the song was really being sung.
 class App.AsyncSong extends App.Song
+  # This constructor like the ones above also takes an optional *callback*
+  # function which will allow things to happen after the song is finished.
   constructor: (bottles, @callback) ->
     super bottles
     App.asyncRunning = on
+  # Handle the sing method and pass it on to the async recursive function.
   sing: ->
     super
     @singVerse()
+  # This methos calls itself through the use of `setTimeout`.
+  #
+  # Each time it executes it checks the `App.asyncRunning` boolean to see if it
+  # should abandon (finish) this loop or continue. When complete it will execute
+  # the callback if it exists
   singVerse: =>
     if App.asyncRunning and @bottle_count >= 0
       @printVerse()
@@ -205,20 +225,33 @@ class App.AsyncSong extends App.Song
       @callback?()
 
 
-# ##Display Adapters
+# ## Display Adapters
 # Used to display the results. Uses an adapter model to allow multiple ways to
 # display the output.
 class App.DisplayAdapter
   constructor: ->
     @resetLines()
+  # this is only used for some adapters so we will default to "no"
   isBottleCountUnsafe: (bottle_count) -> no
+  # clear() is responsable for clearing the output buffer (not applicable for
+  # all adapters)
   clear: ->
     @resetLines()
+  # print() will add a line of text to the output buffer
   print: (text) ->
     @lines.push text
+  # flush() is responsible for displaying the output buffer. Functionally used to
+  # display a full verse.
   flush: ->
+  # resetLines() will clear out the internal output buffer. **this should be
+  # called in every implementation of flush()**
   resetLines: ->
     @lines = []
+  # getAdapter() is a static method which will create a new adapter based on a
+  # string keyword. This is an entirely optional method designed to make web site
+  # integration easier allowing the value of a input field drive the choice of
+  # what display adapter to use. It also illustrates the use of the CS switch
+  # statement.
   @getAdapter: (display_id, selector) ->
     switch display_id
       when "jq" then new App.JqDisplay(selector)
@@ -227,25 +260,8 @@ class App.DisplayAdapter
       else new App.ConsoleDisplay
 
 
-# ### jQuery diaply adapter
-do ($ = jQuery) ->
-  class App.JqDisplay extends App.DisplayAdapter
-    constructor: (@selector) ->
-      throw App.errors.MissingArgument unless @selector?
-      super
-      @el = $(@selector)
-    clear: ->
-      super
-      @el.empty()
-    flush: ->
-      html = "<p>"
-      html += "#{line}<br />" for line in @lines
-      html += "</p>"
-      @el.append html
-      @resetLines()
-
-
 # ### Console Display Adapter (default)
+# A simple display adapter that writes all output to the JavaScript console.
 class App.ConsoleDisplay extends App.DisplayAdapter
   print: (text) ->
     console?.log text
@@ -253,8 +269,26 @@ class App.ConsoleDisplay extends App.DisplayAdapter
     console?.log "-----"
 
 
+# ### Alert display adapter
+# Another simple display adapter which prints out each verse in a pop-up alert.
+#
+# Because this can be a nightmare if the number of verses are large we will
+# prevent this method from working if the bottle count is more then 5 verses.
+# (5 seemed a reasonable number of pop-ups to go through).
+class App.AlertDisplay extends App.DisplayAdapter
+  isBottleCountUnsafe: (bottle_count) -> (bottle_count > 5)
+  flush: ->
+    text = ""
+    text += "#{line}\n" for line in @lines
+    @resetLines()
+    alert text
+
+
 # ### Non-jQuery dom display adapter
-# Used to show how to manipulate the dom for when jQuery is not used.
+# This is an example on how to use a display adapter to manipulate a DIV and
+# print the verses to it using the standard JavaScript DOM functions.
+#
+# We need a selector to work with so fail if one is missing.
 class App.DomDisplay extends App.DisplayAdapter
   constructor: (@selector) ->
     throw App.errors.MissingArgument unless @selector?
@@ -272,15 +306,33 @@ class App.DomDisplay extends App.DisplayAdapter
     @resetLines()
 
 
-# ### Alert display adapter
-class App.AlertDisplay extends App.DisplayAdapter
-  isBottleCountUnsafe: (bottle_count) -> (bottle_count > 5)
+# ### jQuery display adapter
+# This does the same thing as the DomDisplay but uses jQuery syntax to
+# manipulate the DOM. It also checks for a selector argument. If we attempt to
+# use this class on a page that did not load jQuery it will have problems so we
+# check to make sure jQuery is defined. Otherwise fail with an error.
+class App.JqDisplay extends App.DisplayAdapter
+  constructor: (@selector) ->
+    throw App.errors.MissingArgument unless @selector?
+    throw App.errors.MissingLibrary unless jQuery?
+    super
+    @el = jQuery(@selector)
+  clear: ->
+    super
+    @el.empty()
   flush: ->
-    text = ""
-    text += "#{line}\n" for line in @lines
+    html = "<p>"
+    html += "#{line}<br />" for line in @lines
+    html += "</p>"
+    @el.append html
     @resetLines()
-    alert text
 
 
+# If this file is used *without* using CommonJS (as you would if building from a
+# node.js environment using [hem][]) then the module line won't work. We instead
+# allow it to export to the window object. We also will export it for when we do
+# run it in a CommonJS environment.
+#
+# [hem]: http://spinejs.com/docs/hem
 window.App = App
 module?.exports = App

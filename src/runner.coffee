@@ -10,6 +10,14 @@ $ = jQuery
 # It offeres methods to enable and disable the buttons on the page. Along with a
 # single run method that initiates and completes the singing of a song.
 class Runner
+  @init: =>
+    # And your ussual document.ready() setup.
+    jQuery =>
+      @enableControls()
+      $("#runControls button").click @run
+      $("#stopAsyncBtn").click ->
+        App.asyncRunning = off
+        @enableControls()
   @enableControls: =>
     $("#runControls button").removeAttr "disabled"
     $("#asyncControls button").attr "disabled", true
@@ -37,10 +45,4 @@ class Runner
         adapter.flush()
       else throw e
 
-# And your ussual document.ready() setup.
-jQuery ->
-  Runner.enableControls()
-  $("#runControls button").click Runner.run
-  $("#stopAsyncBtn").click ->
-    App.asyncRunning = off
-    Runner.enableControls()
+module.exports = Runner

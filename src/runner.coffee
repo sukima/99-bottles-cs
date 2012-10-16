@@ -1,7 +1,17 @@
 # ## Program main runner
 # This is used to create and run the song. It is application specific and so a
 # seperate module from `99bottles.coffee`. It is dependent on jQuery.
+#
+# To use this Runner class you need to add the following to your index.html
+# after the script tag for `application.js`:
+#
+#     <script type="text/javascript">
+#       Runner = require('runner');
+#       Runner.init();
+#     </script>
+#
 App = require('99bottles')
+require('collapsible')
 $ = jQuery
 
 # ### Runner
@@ -10,28 +20,30 @@ $ = jQuery
 # It offeres methods to enable and disable the buttons on the page. Along with a
 # single run method that initiates and completes the singing of a song.
 class Runner
-  @init: =>
+  @init: ->
     # And your ussual document.ready() setup.
-    jQuery =>
-      @enableControls()
-      $("#runControls button").click @run
+    jQuery ->
+      $("#intro").collapsible()
+      Runner.enableControls()
+      $("#runControls button").click Runner.run
       $("#stopAsyncBtn").click ->
         App.asyncRunning = off
-        @enableControls()
-  @enableControls: =>
+        Runner.enableControls()
+  @enableControls: ->
     $("#runControls button").removeAttr "disabled"
     $("#asyncControls button").attr "disabled", true
-  @disableControls: =>
+  @disableControls: ->
     $("#runControls button").attr "disabled", true
     $("#asyncControls button").removeAttr "disabled"
-  @run: (e) =>
+  @run: ->
+    $("#intro").collapsible("close")
     display_type = $(this).data "display"
     adapter = App.DisplayAdapter.getAdapter display_type, "#output"
     bottles = parseInt $("#bottleCount").val()
 
     if $("input[name=async]:checked").val() is "yes"
-      @disableControls()
-      mySong = new App.AsyncSong bottles, @enableControls
+      Runner.disableControls()
+      mySong = new App.AsyncSong bottles, Runner.enableControls
     else
       mySong = new App.SyncSong bottles
     

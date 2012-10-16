@@ -2,6 +2,14 @@
 {spawn} = require 'child_process'
 fs = require 'fs'
 
+CLEAN_FILES = [
+  'docs/99bottles.html'
+  'docs/runner.html'
+  'docs/docco.css'
+  'application.js'
+  'application.css'
+]
+
 unless fs.existsSync "./node_modules/"
   throw "Missing node_modules. Have you run 'npm install .' yet?"
 
@@ -37,6 +45,8 @@ task 'docs', 'Build the documentation with docco', ->
     print data.toString()
 
 task 'clean', 'Clean up all generatd files', ->
-  fs.rmdir 'public/docs' # fails on non-empty
-  fs.unlink 'public/application.js'
-  fs.unlink 'public/application.css'
+  for file in CLEAN_FILES
+    file = "public/#{file}"
+    if fs.existsSync file
+      fs.unlink file
+      console.log "Removed #{file}"

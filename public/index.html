@@ -5,8 +5,8 @@
     <meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="viewport" content="initial-scale=1.0" />
-    <link rel="stylesheet" href="/style.css" />
-    <script type="text/javascript" src="/application.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="application.js"></script>
     <script type="text/javascript">
       Runner = require('runner');
       Runner.init();
@@ -15,17 +15,31 @@
   <body>
     <h1>99 Bottles of Beer</h1>
     <p class="subtitle">Sung by <a href="http://coffeescript.org" target="_blank">CoffeeScript</a><br />
-    Writen by <a href="http://tritarget.org">Devin Weaver</a></p>
+    Written by <a href="http://tritarget.org">Devin Weaver</a></p>
     <div id="intro" title="introduction">
-      <p>foobar</p>
+      <p>This is an example application written in CoffeeScript to sing the verses
+      to the song "99 Bottles of Beer (On the Wall)".</p>
+      <h4 id="bfheader-5b6cf869265c13af8566f192b4ab3d2a">Documentation</h4>
+      <p>The documentation is split into three modules:</p>
+      <ul>
+        <li><a href="docs/99bottles.html">99bottles.coffee</a> - This is the main application
+        logic. It is responsible for looping through the song and outputting the
+        text with an appropriate display method.</li>
+        <li><a href="docs/runner.html">runner.coffee</a> - This is the implementation specific
+        code which sets up the page. It is the normal cruft you find in the HTML
+        but in this case it was modularized to it's own file.</li>
+        <li><a href="docs/collapsible.html">collapsible.coffee</a> - This is a custom jQuery plugin
+        to allow a div to collapse. <em>(click on the introduction to see this work)</em></li>
+      </ul>
+      <p>Click on a module above to view the detailed annotations to the source code.</p>
     </div>
     <div id="controls">
       <fieldset>
         <label for="bottleCount">Bottle count:</label>
         <input id="bottleCount" type="number" value="99" />
         <label for="async">Execution method:</label>
-        <input type="radio" name="async" value="yes" checked="checked">Asyncronous</input>
-        <input type="radio" name="async" value="no">Syncronized</input>
+        <input type="radio" name="async" value="yes" checked="checked">Asynchronous</input>
+        <input type="radio" name="async" value="no">Synchronized</input>
       </fieldset>
       <fieldset id="runControls">
         <button data-display="console" id="runConsoleBtn">Run in console</button>
@@ -34,7 +48,7 @@
         <button data-display="alert" id="runAlertBtn">Run using alert boxes (max 5)</button>
       </fieldset>
       <fieldset id="asyncControls">
-        <button id="stopAsyncBtn">Stop Asyncronous Execution</button>
+        <button id="stopAsyncBtn">Stop Asynchronous Execution</button>
       </fieldset>
     </div>
     <div id="output">

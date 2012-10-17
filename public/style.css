@@ -1,16 +1,25 @@
 h1 { font-size: 1.6em; }
 p { margin: 10px; }
 .subtitle {
-    margin: 5px 20px;
-    font-size: 0.8em;
+  margin: 5px 20px;
+  font-size: 0.8em;
 }
 #controls { margin: 10px; }
 #output {
-    background: lightblue;
-    border: thin solid black;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    margin:10px;
-    padding: 5px;
+  background: lightblue;
+  border: thin solid black;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  margin:10px;
+  padding: 5px;
+}
+.ui-collapsible {
+  background: lightgreen;
+  border: thin solid black;
+  border-radius: 6px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  margin:10px;
+  padding: 5px;
 }

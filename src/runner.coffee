@@ -36,15 +36,16 @@ class Runner
     $("#runControls button").attr "disabled", true
     $("#asyncControls button").removeAttr "disabled"
   @run: ->
-    $("#intro").collapsible("close")
     display_type = $(this).data "display"
     adapter = App.DisplayAdapter.getAdapter display_type, "#output"
     bottles = parseInt $("#bottleCount").val()
 
     if $("input[name=async]:checked").val() is "yes"
+      $("#intro").collapsible("close")
       Runner.disableControls()
       mySong = new App.AsyncSong bottles, Runner.enableControls
     else
+      $("#intro").collapsible("close", off)
       mySong = new App.SyncSong bottles
     
     mySong.setDisplay(adapter)

@@ -42,15 +42,17 @@ $.fn.extend
         el.wrap $("<div/>", {"class": "ui-collapsible ui-opened"})
         el.parent().prepend $("<h3/>", props)
 
+      toggleClass -> el.parent().toggleClass("ui-opened ui-closed")
+
       switch command
         when "close"
-          el.parent().removeClass("ui-opened")
+          toggleClass()
           if async
             el.slideUp("fast")
           else
             el.hide()
         when "open"
-          el.parent().addClass("ui-opened")
+          toggleClass()
           if async
             el.slideDown("fast")
           else

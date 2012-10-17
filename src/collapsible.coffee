@@ -3,7 +3,7 @@
 $ = jQuery
 
 # ### Usage
-# Initialized any element with the collapsible() function. This will wrap the
+# Initialize any element with the collapsible() function. This will wrap the
 # element and add aheader which is clickable. Clicking on the header will
 # toggle the original div to be visible or not.
 #

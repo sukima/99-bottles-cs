@@ -21,7 +21,6 @@ $ = jQuery
 # single run method that initiates and completes the singing of a song.
 class Runner
   @init: ->
-    # And your ussual document.ready() setup.
     jQuery ->
       $("#intro").collapsible()
       Runner.enableControls()

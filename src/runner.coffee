@@ -52,6 +52,7 @@ class Runner
     try
       mySong.sing()
     catch e
+      Runner.enableControls()
       if e.name is "BottleCountError"
         adapter.print "#{e.message.cap()}."
         adapter.flush()

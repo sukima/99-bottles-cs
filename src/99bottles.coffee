@@ -8,14 +8,11 @@
 # [99 bottles of beer][] programming language database.
 #
 # This file is the basic file you would use to run in your own webpage. The
-# supporting files such as the original [source][], [demo][] or to run the
-# [unit tests][] You can visit the project [homepage][]
+# supporting files such as the original [source][1], [demo][1] or to run the
+# [unit tests][1] You can visit the project [homepage][1]
 #
 # [99 bottles of beer]: http://99-bottles-of-beer.net/
-# [source]: http://github.com/sukima/99-bottles-cs/
-# [demo]: http://sukima.github.com/99-bottles-cs/
-# [unit tests]: http://sukima.github.com/99-bottles-cs/
-# [homepage]: http://sukima.github.com/99-bottles-cs/
+# [1]: http://sukima.github.com/99-bottles-cs/
 #
 # ### How it works
 # Depending on your environment and prefered execution method you instantiate a

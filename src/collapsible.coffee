@@ -36,26 +36,25 @@ $.fn.extend
           class: "ui-opened"
           click: ->
             clicked_el = $(this)
-            opened = clicked_el.parent().hasClass("ui-opened")
+            opened = clicked_el.hasClass("ui-opened")
             command = if opened then "close" else "open"
             clicked_el.next().collapsible(command)
 
-        el.wrap $("<div/>", {"class": "ui-collapsible ui-opened"})
+        el.wrap $("<div/>", {"class": "ui-collapsible"})
         el.parent().prepend $("<h3/>", props)
 
-      toggleClass = (e) -> e.toggleClass("ui-opened ui-closed")
-
+      h3 = el.prev("h3")
       switch command
         when "close"
-          toggleClass el.parent()
-          toggleClass el.prev("h3")
+          h3.removeClass "ui-opened"
+          h3.addClass "ui-closed"
           if async
             el.slideUp("fast")
           else
             el.hide()
         when "open"
-          toggleClass el.parent()
-          toggleClass el.prev("h3")
+          h3.addClass "ui-opened"
+          h3.removeClass "ui-closed"
           if async
             el.slideDown("fast")
           else

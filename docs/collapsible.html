@@ -1,0 +1,61 @@
+<!DOCTYPE html>  <html> <head>   <title>collapsible.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="99bottles.html">                 99bottles.coffee               </a>                                           <a class="source" href="collapsible.html">                 collapsible.coffee               </a>                                           <a class="source" href="runner.html">                 runner.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               collapsible.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>Collapsible: jQuery plugin</h2>
+
+<p>A simple plugin to add collapible support to divs</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">$ = </span><span class="nx">jQuery</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h3>Usage</h3>
+
+<p>Initialize any element with the collapsible() function. This will wrap the
+element and add aheader which is clickable. Clicking on the header will
+toggle the original div to be visible or not.</p>
+
+<p>You can progromatically open and close using the collapsible("open") and
+collapsible("close") commands.</p>
+
+<p>You can turn of animation by passing false ass the second argument to
+collapsible.</p>
+
+<h4>Example</h4>
+
+<pre><code>require('collapsible');
+// Initialize
+$(".collapsible").collapsible();
+// Close the div
+$("#myDiv").collapsible("close");
+// Open the div
+$("#myDiv").collapsible("open");
+// Close the div no animation
+$("#myDiv").collapsible("close", false);
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">$</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">extend</span>
+  <span class="nv">collapsible: </span><span class="nf">(command = &quot;&quot;, async = true) -&gt;</span>
+    <span class="k">return</span> <span class="nx">@each</span> <span class="o">-&gt;</span>
+
+      <span class="nv">el = </span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+      <span class="nx">unless</span> <span class="nx">el</span><span class="p">.</span><span class="nx">parent</span><span class="p">().</span><span class="nx">hasClass</span><span class="p">(</span><span class="s2">&quot;ui-collapsible&quot;</span><span class="p">)</span>
+        <span class="nv">props =</span>
+          <span class="nv">text: </span><span class="nx">el</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+          <span class="k">class</span><span class="o">:</span> <span class="s2">&quot;ui-opened&quot;</span>
+          <span class="nv">click: </span><span class="o">-&gt;</span>
+            <span class="nv">clicked_el = </span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+            <span class="nv">opened = </span><span class="nx">clicked_el</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s2">&quot;ui-opened&quot;</span><span class="p">)</span>
+            <span class="nv">command = </span><span class="k">if</span> <span class="nx">opened</span> <span class="k">then</span> <span class="s2">&quot;close&quot;</span> <span class="k">else</span> <span class="s2">&quot;open&quot;</span>
+            <span class="nx">clicked_el</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">collapsible</span><span class="p">(</span><span class="nx">command</span><span class="p">)</span>
+
+        <span class="nx">el</span><span class="p">.</span><span class="nx">wrap</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;div/&gt;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span><span class="o">:</span> <span class="s2">&quot;ui-collapsible&quot;</span><span class="p">})</span>
+        <span class="nx">el</span><span class="p">.</span><span class="nx">parent</span><span class="p">().</span><span class="nx">prepend</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;&lt;h3/&gt;&quot;</span><span class="p">,</span> <span class="nx">props</span><span class="p">)</span>
+
+      <span class="nv">h3 = </span><span class="nx">el</span><span class="p">.</span><span class="nx">prev</span><span class="p">(</span><span class="s2">&quot;h3&quot;</span><span class="p">)</span>
+      <span class="k">switch</span> <span class="nx">command</span>
+        <span class="k">when</span> <span class="s2">&quot;close&quot;</span>
+          <span class="nx">h3</span><span class="p">.</span><span class="nx">removeClass</span> <span class="s2">&quot;ui-opened&quot;</span>
+          <span class="nx">h3</span><span class="p">.</span><span class="nx">addClass</span> <span class="s2">&quot;ui-closed&quot;</span>
+          <span class="k">if</span> <span class="nx">async</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">slideUp</span><span class="p">(</span><span class="s2">&quot;fast&quot;</span><span class="p">)</span>
+          <span class="k">else</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">hide</span><span class="p">()</span>
+        <span class="k">when</span> <span class="s2">&quot;open&quot;</span>
+          <span class="nx">h3</span><span class="p">.</span><span class="nx">addClass</span> <span class="s2">&quot;ui-opened&quot;</span>
+          <span class="nx">h3</span><span class="p">.</span><span class="nx">removeClass</span> <span class="s2">&quot;ui-closed&quot;</span>
+          <span class="k">if</span> <span class="nx">async</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">slideDown</span><span class="p">(</span><span class="s2">&quot;fast&quot;</span><span class="p">)</span>
+          <span class="k">else</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">show</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

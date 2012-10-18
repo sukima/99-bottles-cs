@@ -1,0 +1,61 @@
+<!DOCTYPE html>  <html> <head>   <title>runner.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="99bottles.html">                 99bottles.coffee               </a>                                           <a class="source" href="collapsible.html">                 collapsible.coffee               </a>                                           <a class="source" href="runner.html">                 runner.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               runner.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h2>Program main runner</h2>
+
+<p>This is used to create and run the song. It is application specific and so a
+seperate module from <code>99bottles.coffee</code>. It is dependent on jQuery.</p>
+
+<p>To use this Runner class you need to add the following to your index.html
+after the script tag for <code>application.js</code>:</p>
+
+<pre><code>&lt;script type="text/javascript"&gt;
+  Runner = require('runner');
+  Runner.init();
+&lt;/script&gt;
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">App = </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;99bottles&#39;</span><span class="p">)</span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">&#39;collapsible&#39;</span><span class="p">)</span>
+<span class="nv">$ = </span><span class="nx">jQuery</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h3>Runner</h3>
+
+<p>A class to encapsolate the application logic.</p>
+
+<p>It offeres methods to enable and disable the buttons on the page. Along with a
+single run method that initiates and completes the singing of a song.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Runner</span>
+  <span class="vi">@init: </span><span class="o">-&gt;</span>
+    <span class="nx">jQuery</span> <span class="o">-&gt;</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#intro&quot;</span><span class="p">).</span><span class="nx">collapsible</span><span class="p">()</span>
+      <span class="nx">Runner</span><span class="p">.</span><span class="nx">enableControls</span><span class="p">()</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">click</span> <span class="nx">Runner</span><span class="p">.</span><span class="nx">run</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#stopAsyncBtn&quot;</span><span class="p">).</span><span class="nx">click</span> <span class="o">-&gt;</span>
+        <span class="nv">App.asyncRunning = </span><span class="kc">off</span>
+        <span class="nx">Runner</span><span class="p">.</span><span class="nx">enableControls</span><span class="p">()</span>
+  <span class="vi">@enableControls: </span><span class="o">-&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">removeAttr</span> <span class="s2">&quot;disabled&quot;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#asyncControls button&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s2">&quot;disabled&quot;</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="vi">@disableControls: </span><span class="o">-&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#runControls button&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s2">&quot;disabled&quot;</span><span class="p">,</span> <span class="kc">true</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#asyncControls button&quot;</span><span class="p">).</span><span class="nx">removeAttr</span> <span class="s2">&quot;disabled&quot;</span>
+  <span class="vi">@run: </span><span class="o">-&gt;</span>
+    <span class="nv">display_type = </span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">data</span> <span class="s2">&quot;display&quot;</span>
+    <span class="nv">adapter = </span><span class="nx">App</span><span class="p">.</span><span class="nx">DisplayAdapter</span><span class="p">.</span><span class="nx">getAdapter</span> <span class="nx">display_type</span><span class="p">,</span> <span class="s2">&quot;#output&quot;</span>
+    <span class="nv">bottles = </span><span class="nb">parseInt</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#bottleCount&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;input[name=async]:checked&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">is</span> <span class="s2">&quot;yes&quot;</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#intro&quot;</span><span class="p">).</span><span class="nx">collapsible</span><span class="p">(</span><span class="s2">&quot;close&quot;</span><span class="p">)</span>
+      <span class="nx">Runner</span><span class="p">.</span><span class="nx">disableControls</span><span class="p">()</span>
+      <span class="nv">mySong = </span><span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">AsyncSong</span> <span class="nx">bottles</span><span class="p">,</span> <span class="nx">Runner</span><span class="p">.</span><span class="nx">enableControls</span>
+    <span class="k">else</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#intro&quot;</span><span class="p">).</span><span class="nx">collapsible</span><span class="p">(</span><span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">off</span><span class="p">)</span>
+      <span class="nv">mySong = </span><span class="k">new</span> <span class="nx">App</span><span class="p">.</span><span class="nx">SyncSong</span> <span class="nx">bottles</span>
+    
+    <span class="nx">mySong</span><span class="p">.</span><span class="nx">setDisplay</span><span class="p">(</span><span class="nx">adapter</span><span class="p">)</span>
+    
+    <span class="k">try</span>
+      <span class="nx">mySong</span><span class="p">.</span><span class="nx">sing</span><span class="p">()</span>
+    <span class="k">catch</span> <span class="nx">e</span>
+      <span class="nx">Runner</span><span class="p">.</span><span class="nx">enableControls</span><span class="p">()</span>
+      <span class="k">if</span> <span class="nx">e</span><span class="p">.</span><span class="nx">name</span> <span class="o">is</span> <span class="s2">&quot;BottleCountError&quot;</span>
+        <span class="nx">adapter</span><span class="p">.</span><span class="nx">print</span> <span class="s2">&quot;#{e.message.cap()}.&quot;</span>
+        <span class="nx">adapter</span><span class="p">.</span><span class="nx">flush</span><span class="p">()</span>
+      <span class="k">else</span> <span class="k">throw</span> <span class="nx">e</span>
+
+<span class="nv">module.exports = </span><span class="nx">Runner</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

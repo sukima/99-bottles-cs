@@ -143,10 +143,10 @@ class App.Song
 
   # Construct a full verse taking into account how many bottles are left. Then
   # use the assigned display adapter to output the new verse.
-  printVerse: (s = App.strings) ->
-    @getDisplay().print "#{@bottles().cap()} #{s.on_the_wall}, #{@bottles()}."
-    if @bottle_count > 0
-      @getDisplay().print "#{s.take_one_down.cap()}, #{@bottles(@bottle_count - 1)} #{s.on_the_wall}."
+  printVerse: (bottle_count = @bottle_count, s = App.strings) ->
+    @getDisplay().print "#{@bottles(bottle_count).cap()} #{s.on_the_wall}, #{@bottles(bottle_count)}."
+    if bottle_count > 0
+      @getDisplay().print "#{s.take_one_down.cap()}, #{@bottles(bottle_count - 1)} #{s.on_the_wall}."
     else
       @getDisplay().print "#{s.buy_some_more.cap()}, #{@bottles(@initial_bottle_count)} #{s.on_the_wall}."
     @getDisplay().flush()
@@ -168,30 +168,44 @@ class App.Song
 # This version of the loop is *synchronous* meaning it will block the
 # environment until the loop finishes.
 #
-# Becouse of this blocking if our loop is too long it can freeze the browser.
-# The contructor will ask the user if they are sure they want to continue if the
-# requested number of verses reach 1200 bottles. (limit choosen at a whim)
+# Because of this blocking if our loop is too long it can freeze the browser.
+# The constructor will ask the user if they are sure they want to continue if the
+# requested number of verses reach 1200 bottles. (limit chosen at a whim)
 class App.SyncSong extends App.Song
   constructor: (bottles) ->
     if bottles >= 1200
       throw App.errors.BottleCountTooLarge unless confirm App.strings.large_loop_warn
     super bottles
-  # We overide the sing method to run our loop. Calling super allows us to use
-  # the safty checks from the parrent Song object above.
+  # We override the sing method to run our loop. Calling super allows us to use
+  # the safety checks from the parent Song object above.
   sing: ->
     super
-    # The for loop is a good example of how simple CS can be.
-    @printVerse() for i in [@bottle_count..0]
+    # CoffeeScript abstracts for loops. This statement will not change
+    # `@bottle_count`. In most cases this is preferred but in this one use case
+    # it looks redundant to also decrement the variable on our own.
+    #
+    #     for i in [@bottle_count..0]
+    #       @printVerse()
+    #       @bottle_count--
+    #
+    # A better approach is to avoid a state/instance variable and instead
+    # pass the counter to the function in question. The downside is that
+    # `@bottle_count` will not hold an accurate value of the current state.
+    # However, since this is in a synchronous method there is never going to be
+    # need to access the state outside of the running loop. Only in
+    # Asynchronous methods would the `@bottle_count` need to be accurate.
+    @printVerse(count) for count in [@bottle_count..0]
+
     # The use of return at the end stops CS from creating a results array like
-    # it usually does with the for loop. It's done purly so the JavaScript
+    # it usually does with the for loop. It's done purely so the JavaScript
     # created is slightly more efficient since we will not use the results.
     return
 
 
 # ### Asynchronous Song
 # This execution method uses JavaScript's `setTimeout` function to return the
-# thread control back to the browser intermitently. This form of non-blocking
-# allows the user to feel like he/she still can intereact with the web page even
+# thread control back to the browser intermittently. This form of non-blocking
+# allows the user to feel like he/she still can interact with the web page even
 # though there is work being done in the background. Granted the work is
 # blocking as it executes but because we only calculate on interval of the loop
 # at a time in between the steps the browser lets the user interact. This form

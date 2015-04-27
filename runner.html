@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>Jasmine Test Runner</title>
+  </head>
+
+  <body>
+
+    <script type="text/javascript" src="/Users/suki/source/99-bottles-cs/node_modules/phantom-jasmine/vendor/jasmine-1.2.0/jasmine.js"></script>
+    <script type="text/javascript" src="/Users/suki/source/99-bottles-cs/node_modules/phantom-jasmine/vendor/jasmine-1.2.0/jasmine-html.js"></script>
+    
+    
+    <script src="/Users/suki/source/99-bottles-cs/test/public/lib/jasmine.html.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/Users/suki/source/99-bottles-cs/test/public/lib/jasmine.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript" src="/Users/suki/source/99-bottles-cs/node_modules/phantom-jasmine/lib/console-runner.js"></script>
+
+    <script type="text/javascript">
+      var console_reporter = new jasmine.ConsoleReporter()
+      jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+      jasmine.getEnv().addReporter(console_reporter);
+      jasmine.getEnv().execute();
+    </script>
+  </body>
+</html>

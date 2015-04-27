@@ -4,7 +4,8 @@
   "dependencies": { 
     "coffee-script": "~1.3.0",
     "serveup": "~0.0.4",
-    "hem": "git://github.com/maccman/hem.git",
-    "docco": "latest"
+    "hem": "git://github.com/spine/hem.git",
+    "docco": "latest",
+    "phantom-jasmine": "~0.1.0"
   }
 }

@@ -15,7 +15,7 @@ See it in action at http://sukima.github.com/99-bottles-cs/
 [99 bottles of beer]: http://99-bottles-of-beer.net/
 [CommonJS]: http://www.commonjs.org/
 [jQuery plugins]: http://docs.jquery.com/Plugins/Authoring
-[Jasmine]: http://pivotal.github.com/jasmine/
+[Jasmine]: https://jasmine.github.io/
 [node.js]: http://nodejs.org/
 [hem]: http://spinejs.com/docs/hem
 [docco]: http://jashkenas.github.com/docco/
